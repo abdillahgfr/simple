@@ -1,0 +1,46 @@
+// main: ../style.scss
+/********************************
+*********************************
+Counters
+*********************************
+*********************************/
+.counter-gradient {
+  padding: em(30) em(20);
+
+  .counter {
+    color: $primary;
+  }
+}
+
+.counter-w-info {
+  margin: rem(5) 0 0;
+  font-family: $headings-font-family;
+  font-size: rem(13);
+
+  .counter {
+    font-size: $h3-font-size;
+    letter-spacing: $headings-letter-spacing;
+  }
+
+  .counter-title {
+    font-size: $h4-font-size;
+    line-height: 1.2;
+    color: $headings-color;
+  }
+
+  .counter-difference {
+    font-weight: 700;
+    position: relative;
+    top: -2px;
+  }
+
+  .list-icon {
+    height: rem(60);
+    width: rem(60);
+    line-height: rem(60);
+    font-size: rem(24);
+    border-radius: 50px;
+    display: inline-block;
+    text-align: center;
+  }
+}
