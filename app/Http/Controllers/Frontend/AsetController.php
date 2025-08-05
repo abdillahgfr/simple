@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use App\Models\IdentifikasiAset;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver; 
+
+
 
 class AsetController extends Controller
 {
@@ -149,8 +154,332 @@ class AsetController extends Controller
             'results' => $results,
             'total' => $total,
             'perPage' => $perPage,
-            'page' => $page
+            'page' => $page,
         ]);
     }
+
+    public function form(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Please log in first.']);
+        }
+
+        // Ambil guid_aset dari query, tidak peduli huruf besar/kecil
+        $guidAset = $request->query('GUID_ASET') ?? $request->query('guid_aset');
+        $aset = null;
+
+        if ($guidAset) {
+            $aset = DB::connection('sqlsrv')->table('REKON5_B2024 as a')
+                ->leftJoin('bpadmaster.dbo.master_profile as b', 'a.kolok', '=', 'b.id_kolok')
+                ->leftJoin('bpadmaster.dbo.master_profile as b3', 'a.KOLOKSKPD', '=', 'b3.id_kolok')
+                ->leftJoin('bpadmaster.dbo.master_profile as b2', 'a.KOLOKUPB', '=', 'b2.id_kolok')
+                ->leftJoin('bpadkobar.dbo.data_nabar as c', 'a.kobar_108', '=', 'c.KOBAR')
+                ->leftJoin('bpadmaster.dbo.glo_asaloleh1 as f', 'a.asaloleh', '=', 'f.KD_ASALOLEH1')
+                ->leftJoin('bpadmaster.dbo.glo_wil_kelurahan as lurah', 'a.KDLURAH', '=', 'lurah.kd_bpad')
+                ->leftJoin('bpadmaster.dbo.glo_wil_kecamatan as camat', function($join) {
+                    $join->on('lurah.kd_prop', '=', 'camat.kd_prop')
+                        ->on('lurah.kd_rayon', '=', 'camat.kd_rayon')
+                        ->on('lurah.kd_kec', '=', 'camat.kd_kec');
+                })
+                ->leftJoin('bpadmaster.dbo.glo_wil_rayon as rayon', function($join) {
+                    $join->on('rayon.kd_prop', '=', 'lurah.kd_prop')
+                        ->on('rayon.kd_rayon', '=', 'lurah.kd_rayon');
+                })
+                ->leftJoin('bpadmaster.dbo.glo_wil_provinsi as prop', 'lurah.kd_prop', '=', 'prop.kd_prop')
+                ->select(
+                    'a.*',
+                    'b.NALOK',
+                    'b3.NALOK as NALOKSKPD',
+                    'b2.nalok as NALOKSEKOLAH',
+                    'c.nabar as NABAR',
+                    'f.nm_asaloleh1 as ASAL_OLEH',
+                    'tgloleh as TGL_PEROLEHAN',
+                    'harga as HARGA_PEROLEHAN',
+                    'lurah.nm_kel as KELURAHAN',
+                    'camat.nm_kec as KECAMATAN',
+                    'rayon.nm_rayon as RAYON',
+                    'prop.nm_prop as PROVINSI'
+                )
+                ->whereRaw('LOWER(a.guid_aset) = LOWER(?)', [$guidAset])
+                ->first();
+        }
+
+        return view('Frontend.FormAset', [
+            'guid_aset' => $guidAset,
+            'aset' => $aset
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $manager = new ImageManager(new Driver());
+        $validated = $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:500',
+            'image2' => 'image|mimes:jpg,jpeg,png|max:500',
+            'image3' => 'image|mimes:jpg,jpeg,png|max:500',
+            'image4' => 'image|mimes:jpg,jpeg,png|max:500',
+            'image5' => 'image|mimes:jpg,jpeg,png|max:500',
+            'nabar' => 'required|string|max:255',
+            'main_image' => 'required|in:image,image2,image3,image4,image5',
+        ]);
+
+        $imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
+        $storedPaths = [];
+
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                $foto = $request->file($field);
+                $filename = uniqid() . '.jpg'; // Simpan sebagai JPG setelah kompresi
+
+                // Proses gambar dengan Intervention Image (direkomendasikan)
+                $image = $manager->read($foto->getPathname());
+                $image->toJpeg(70); // Kompresi ke JPEG dengan kualitas 70%
+
+                // Simpan sementara untuk cek ukuran
+                $tempPath = storage_path("app/temp_{$filename}");
+                $image->save($tempPath);
+
+                $finalSize = filesize($tempPath);
+                if ($finalSize > 500 * 1024) { // Cek ukuran setelah kompresi (500 KB)
+                    unlink($tempPath);
+                    return back()->withErrors(["{$field}" => "Gambar {$field} terlalu besar setelah dikompresi (Max 500KB)."])->withInput();
+                }
+
+                // Simpan permanen ke storage
+                Storage::put("uploads/{$filename}", file_get_contents($tempPath));
+                unlink($tempPath); // Hapus file sementara
+
+                $storedPaths[$field] = "uploads/{$filename}";
+            } else {
+                $storedPaths[$field] = null; // Set null jika tidak ada file diupload
+            }
+        }
+
+        // Tentukan path untuk gambar utama berdasarkan pilihan radio button
+        $mainImageInputName = $request->input('main_image'); // e.g., 'image', 'image2'
+        $mainImagePath = $storedPaths[$mainImageInputName]; // Ambil path yang sudah disimpan
+
+
+        $data = IdentifikasiAset::create([
+            'guid_aset' => $request->guid_aset,
+            'kolok' => $request->kolok,
+            'kolokskpd' => $request->kolokskpd,
+            'nalok' => $request->nalok,
+            'kobar_108' => $request->kobar_108,
+            'nabar' => $request->nabar,
+            'noreg_108' => $request->noreg_108,
+            'bahan' => $request->bahan,
+            'merk' => $request->merk,
+            'tipe' => $request->tipe,
+            'harga' => $request->harga,
+            'tgloleh' => $request->tgloleh,
+            'kondisi' => $request->kondisi,
+            'deskripsi' => $request->deskripsi,
+            'penggunaan_bmd' => $request->penggunaan_bmd,
+            'image' => $storedPaths['image'],
+            'image2' => $storedPaths['image2'],
+            'image3' => $storedPaths['image3'],
+            'image4' => $storedPaths['image4'],
+            'image5' => $storedPaths['image5'],
+            'main_image' => $mainImagePath,
+            'validasi_kepalaskpd' => 'Belum Tervalidasi',
+        ]);
+        return redirect()->back()->with('success', 'Aset berhasil disimpan!');
+        // return response()->json([
+        //     'message' => 'Aset berhasil disimpan!',
+        //     'data' => $data,
+        // ]);
+    }
+
+    public function validasi(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Please log in first.']);
+        }
+
+        $query = IdentifikasiAset::query()
+        ->where('validasi_kepalaskpd', 'Belum Tervalidasi');
+
+        // Filter: Nama Barang
+        if ($request->filled('nabar')) {
+            $query->where('nabar', 'like', '%' . $request->nabar . '%');
+        }
+
+        // Filter: Merk
+        if ($request->filled('merk')) {
+            $query->where('merk', 'like', '%' . $request->merk . '%');
+        }
+
+        // Filter: Kondisi
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        // Filter: Tahun (dari tgloleh)
+        if ($request->filled('tahun')) {
+            $query->whereYear('tgloleh', $request->tahun);
+        }
+
+        // Ambil hasil (pakai pagination kalau perlu)
+        $asets = $query->limit(100)->get();
+
+        $tahunList = IdentifikasiAset::whereNotNull('tgloleh')
+        ->selectRaw('YEAR(tgloleh) as tahun') // pastikan alias 'tahun' dipakai
+        ->groupByRaw('YEAR(tgloleh)')
+        ->orderByRaw('YEAR(tgloleh) DESC')
+        ->pluck('tahun');
+
+        return view('Frontend.ValidasiKepala', compact('asets', 'tahunList'));
+    }
+
+    public function validasiKepala(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Silakan login terlebih dahulu.']);
+        }
+
+        $guidAset = $request->guid_aset;
+
+        $updated = DB::connection('sqlsrv_2')
+            ->table('identifikasi_aset')
+            ->where('guid_aset', $guidAset)
+            ->update(['validasi_kepalaskpd' => 'Validasi']);
+
+        if ($updated) {
+            return back()->with('success', 'Aset berhasil divalidasi.');
+        } else {
+            return back()->withErrors(['error' => 'Aset gagal divalidasi atau tidak ditemukan.']);
+        }
+    }
+
+     public function validasiDetail(Request $request, $guid_aset)
+    {
+        // Cek login
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Silakan login terlebih dahulu.']);
+        }
+
+        // Cek apakah data aset ada
+        $data = DB::connection('sqlsrv_2')
+            ->table('identifikasi_aset')
+            ->where('guid_aset', $guid_aset)
+            ->first();
+
+        if (!$data) {
+            return redirect()->back()->withErrors(['error' => 'Aset tidak ditemukan.']);
+        }
+
+        // Ambil nilai sekarang, default ke 0 jika null
+        $currentCount = is_numeric($data->jumlah_dilihat) ? (int)$data->jumlah_dilihat : 0;
+
+        // Update jumlah_dilihat
+        DB::connection('sqlsrv_2')
+            ->table('identifikasi_aset')
+            ->where('guid_aset', $guid_aset)
+            ->update([
+                'jumlah_dilihat' => $currentCount + 1
+            ]);
+
+        // Ambil ulang data yang sudah diperbarui via model Eloquent
+        $aset = IdentifikasiAset::where('guid_aset', $guid_aset)->first();
+
+        // Tahun list
+        $tahunList = IdentifikasiAset::whereNotNull('tgloleh')
+            ->selectRaw('YEAR(tgloleh) as tahun')
+            ->groupByRaw('YEAR(tgloleh)')
+            ->orderByRaw('YEAR(tgloleh) DESC')
+            ->pluck('tahun');
+
+        return view('Frontend.RincianAsetValidasi', compact('aset', 'tahunList'));
+    }
+
+    public function show(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Please log in first.']);
+        }
+
+         $query = IdentifikasiAset::query()
+        ->where('validasi_kepalaskpd', 'Validasi');
+
+        // Filter: Nama Barang
+        if ($request->filled('nabar')) {
+            $query->where('nabar', 'like', '%' . $request->nabar . '%');
+        }
+
+        // Filter: Merk
+        if ($request->filled('merk')) {
+            $query->where('merk', 'like', '%' . $request->merk . '%');
+        }
+
+        // Filter: Kondisi
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        // Filter: Tahun (dari tgloleh)
+        if ($request->filled('tahun')) {
+            $query->whereYear('tgloleh', $request->tahun);
+        }
+
+        // Ambil hasil (pakai pagination kalau perlu)
+        $asets = $query->limit(100)->get();
+
+        $tahunList = IdentifikasiAset::whereNotNull('tgloleh')
+        ->selectRaw('YEAR(tgloleh) as tahun') // pastikan alias 'tahun' dipakai
+        ->groupByRaw('YEAR(tgloleh)')
+        ->orderByRaw('YEAR(tgloleh) DESC')
+        ->pluck('tahun');
+
+        return view('Frontend.DisplayAset', compact('asets', 'tahunList'));
+    }
+
+    public function detail(Request $request, $guid_aset)
+    {
+        // Cek login
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['login_error' => 'Silakan login terlebih dahulu.']);
+        }
+
+        // Cek apakah data aset ada
+        $data = DB::connection('sqlsrv_2')
+            ->table('identifikasi_aset')
+            ->where('guid_aset', $guid_aset)
+            ->first();
+
+        if (!$data) {
+            return redirect()->back()->withErrors(['error' => 'Aset tidak ditemukan.']);
+        }
+
+        // Ambil nilai sekarang, default ke 0 jika null
+        $currentCount = is_numeric($data->jumlah_dilihat) ? (int)$data->jumlah_dilihat : 0;
+
+        // Update jumlah_dilihat
+        DB::connection('sqlsrv_2')
+            ->table('identifikasi_aset')
+            ->where('guid_aset', $guid_aset)
+            ->update([
+                'jumlah_dilihat' => $currentCount + 1
+            ]);
+
+        // Ambil ulang data yang sudah diperbarui via model Eloquent
+        $aset = IdentifikasiAset::where('guid_aset', $guid_aset)->first();
+
+        // Tahun list
+        $tahunList = IdentifikasiAset::whereNotNull('tgloleh')
+            ->selectRaw('YEAR(tgloleh) as tahun')
+            ->groupByRaw('YEAR(tgloleh)')
+            ->orderByRaw('YEAR(tgloleh) DESC')
+            ->pluck('tahun');
+
+        return view('Frontend.RincianAset', compact('aset', 'tahunList'));
+    }
+
 
 }

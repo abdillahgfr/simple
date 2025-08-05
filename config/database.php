@@ -111,6 +111,21 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        
+        // Second SQL Server connection
+        'sqlsrv_2' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_SECOND_HOST', 'localhost'),
+            'port' => env('DB_SECOND_PORT', '1433'),
+            'database' => env('DB_SECOND_DATABASE', 'bpad_simple_web'),
+            'username' => env('DB_SECOND_USERNAME', 'data_abdi'),
+            'password' => env('DB_SECOND_PASSWORD', 'data_abdi_aja'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
+            'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
     ],
 
     /*

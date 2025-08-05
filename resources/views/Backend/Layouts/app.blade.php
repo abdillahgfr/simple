@@ -27,7 +27,7 @@
     <meta name="theme-color" content="#ffffff">
 
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Login</title>
+    <title>Login | Sistem Pengelolaan Aset Idle</title>
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,500,600%7CRoboto:400" rel="stylesheet" type="text/css">
     <link href="assets/vendors/material-icons/material-icons.css" rel="stylesheet" type="text/css">

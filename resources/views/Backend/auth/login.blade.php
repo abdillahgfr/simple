@@ -12,28 +12,24 @@
             height: 100vh;
         }
 
-        /* Remove flex: 1 from .login-left and .login-right */
-        .login-left,
-        .login-right {
-            /* flex: 1; */
-        }
-
         .login-left {
-            background-color: #f5f5f5;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .login-left img {
-            height: auto;
+            max-height: 80%;
+            width: auto;
         }
 
         .login-right {
+            border-left: #e5e5e5 1px solid;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* padding: 3rem; */
         }
 
         .login-box {
@@ -41,15 +37,9 @@
             max-width: 400px;
         }
 
-        .login-box h2 {
+        .login-box h4 {
             font-weight: bold;
-            margin-bottom: 1rem;
-            color: #222;
-        }
-
-        .login-box .form-group label {
-            font-size: 14px;
-            font-weight: 500;
+            color: #333;
         }
 
         .login-box .form-control {
@@ -62,6 +52,7 @@
             padding: 10px;
             font-weight: bold;
             text-transform: uppercase;
+            width: 100%;
         }
 
         .bottom-links {
@@ -78,14 +69,25 @@
 
     <div class="container-fluid h-100">
         <div class="row h-100 align-items-center login-wrapper">
-            <div class="col-12 col-md-6 login-left">
-                <img src="{{ asset('assets/img/image-front.png') }}" alt="Illustration">
+            {{-- LEFT IMAGE SIDE --}}
+            <div class="col-md-6 col-sm-6 d-flex justify-content-center">
+                <div class="text-center p-3 w-75 d-flex flex-column align-items-center">
+                    {{-- Logo bagian atas --}}
+                    <div class="d-flex justify-content-center" style="margin-bottom: -2.75rem !important">
+                        <img src="{{ asset('assets/img/image-up-login.png') }}" style="width: 40px;" alt="Logo Pemprov">
+                        <img src="{{ asset('assets/img/image-up.png') }}" style="width: 60px;" alt="Logo BPAD">
+                    </div>
+
+                    {{-- Gambar utama --}}
+                    <img src="{{ asset('assets/img/image-front.png') }}" alt="Ilustrasi Aset Idle">
+                </div>
             </div>
 
-            <div class="col-12 col-md-6 login-right">
-                <div class="login-box">
+            {{-- RIGHT LOGIN FORM SIDE --}}
+            <div class="col-md-6 col-sm-6">
+                <div class="login-box mx-auto" style="max-width: 420px;">
                     <div class="text-center mb-4">
-                        <img src="{{ asset('assets/img/logo-header.png') }}" width="300" class="mb-2 mt-2" />
+                        <img src="{{ asset('assets/img/logo-header.png') }}" width="250" class="mb-3 mt-2" />
                     </div>
                     <h4 class="text-center"><b>Sign in</b></h4>
 
@@ -109,10 +111,11 @@
                             <label for="password">Password</label>
                             <input type="password" class="form-control" name="password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
 
-                    <div class="bottom-links mt-4">
+                    <div class="bottom-links mt-4 text-center">
                         <a href="#">Video Tutorial</a> |
                         <a href="#">Manual Book</a>
                         <br>
@@ -126,7 +129,7 @@
 
 @if ($errors->has('login_error'))
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.toast({
                 heading: 'Login Gagal',
                 text: '{{ $errors->first('login_error') }}',

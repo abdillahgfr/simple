@@ -5,12 +5,12 @@
         <!-- Page Title Area -->
         <div class="row page-title clearfix">
             <div class="page-title-left">
-                <h6 class="page-title-heading mr-0 mr-r-5">Identifikasi Aset Idle</h6>
+                <h6 class="page-title-heading mr-0 mr-r-5">Validasi Aset Idle</h6>
             </div>
             <!-- /.page-title-left -->
             <div class="page-title-right d-none d-sm-inline-flex">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Identifikasi Aset Idle</a>
+                    <li class="breadcrumb-item"><a href="index.html">Validasi Aset Idle</a>
                     </li>
                     <li class="breadcrumb-item active">Home</li>
                 </ol>
@@ -37,18 +37,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($results as $aset)
+                            @foreach($asets as $asset)
                                 <tr>
-                                    <td class="text-center">{{ $aset->KOBAR }}</td>
-                                    <td class="text-center">{{ $aset->NOREG }}</td>
-                                    <td class="text-center">{{ $aset->NABAR }}</td>
-                                    <td class="text-center">{{ $aset->TGL_PEROLEHAN }}</td>
-                                    <td class="text-center">{{ number_format($aset->HARGA_PEROLEHAN, 0, ',', '.') }}</td>
-                                    <td class="text-center">{{ $aset->BAHAN }}</td>
-                                    <td class="text-center">{{ $aset->MERK }}</td>
-                                    <td class="text-center">{{ $aset->TIPE }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('frontend.formaset', ['GUID_ASET' => $aset->GUID_ASET ]) }}" class="btn btn-sm btn-warning"><i class="material-icons">add_box</i></a>
+                                    <td class="text-center">{{ $asset->kobar_108 }}</td>
+                                    <td class="text-center">{{ $asset->noreg_108 }}</td>
+                                    <td class="text-center">{{ $asset->nabar }}</td>
+                                    <td class="text-center">{{ $asset->tgloleh }}</td>
+                                    <td class="text-center">{{ number_format($asset->harga, 0, ',', '.') }}</td>
+                                    <td class="text-center">{{ $asset->bahan }}</td>
+                                    <td class="text-center">{{ $asset->merk }}</td>
+                                    <td class="text-center">{{ $asset->tipe }}</td>
+                                    <td>
+                                        <form action="{{ route('frontend.asetvalidasi') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin memvalidasi aset ini?')">
+                                            @csrf
+                                            <input type="hidden" name="guid_aset" value="{{ $asset->guid_aset }}">
+                                            <button type="submit" class="btn btn-success btn-sm" 
+                                                {{ $asset->validasi_kepalaskpd === 'Validasi' ? 'disabled' : '' }}>
+                                                Validasi
+                                            </button>
+                                        </form>
+
+                                        <a href="{{ route('frontend.validasiasetdetail', ['guid_aset' => $asset->guid_aset]) }}" class="text-decoration-none">
+                                            <button class="btn btn-info btn-sm mt-2"> Rincian</button>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

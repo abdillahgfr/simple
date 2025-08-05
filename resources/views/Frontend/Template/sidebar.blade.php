@@ -5,7 +5,7 @@
         <div class="col-sm-12 text-center p-0 clearfix">
             <div class="d-inline-block pos-relative mr-b-10">
                 <figure class="thumb-sm mr-b-0 user--online">
-                    <img src="assets/demo/users/user1.jpg" class="rounded-circle" alt="">
+                    <img src="/assets/demo/users/user1.jpg" class="rounded-circle" alt="">
                 </figure><a href="page-profile.html" class="text-muted side-user-link"><i class="feather feather-settings list-icon"></i></a>
             </div>
             <!-- /.d-inline-block -->
@@ -30,9 +30,15 @@
                     </li>
                 </ul>
             </li>
-            <li class="menu-item-has-children"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Display Aset Idle</a>
+            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.validasiaset') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Validasi Aset Idle</a>
                 <ul class="list-unstyled sub-menu">
-                    <li><a href="../default/app-chat.html">KIB B</a>
+                    <li><a href="{{ route('frontend.validasiaset') }}">KIB B</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.asetidle') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Display Aset Idle</a>
+                <ul class="list-unstyled sub-menu">
+                    <li><a href="{{ route('frontend.asetidle') }}">KIB B</a>
                     </li>
                 </ul>
             </li>

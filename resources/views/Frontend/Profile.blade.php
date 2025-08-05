@@ -42,7 +42,7 @@
 
                                 <div class="form-group">
                                     <label for="nama">Nama</label>
-                                    <input type="text" class="form-control" name="nama" id="nama" placeholder="{{ $user->nm_emp ?? $user->nama  }}" readonly>
+                                    <input type="text" class="form-control" name="nama" id="nama" placeholder="{{ $user->nm_emp ?? $user->nama ?? $user->nama_user  }}" readonly>
                                 </div>
 
                                 <div class="form-group">
@@ -51,13 +51,13 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="telepon">Unit</label>
-                                    <input type="text" class="form-control" name="telepon" id="telepon" placeholder="{{ $user->status_emp ?? $user->skpd }}" readonly>
+                                    <label for="unit">Unit</label>
+                                    <input type="text" class="form-control" name="unit" id="unit" placeholder="{{ $user->status_emp ?? $user->skpd ?? 'Administrator' }}" readonly>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="email">Akses</label>
-                                    <input type="email" class="form-control" name="email" id="email" placeholder="{{ $user->idgroup}}" readonly>
+                                    <label for="akses">Akses</label>
+                                    <input type="akses" class="form-control" name="akses" id="akses" placeholder="{{ $user->idgroup}}" readonly>
                                 </div>
 
                                 {{-- <div class="form-group text-center mt-4">
