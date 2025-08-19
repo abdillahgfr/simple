@@ -31,11 +31,13 @@ Route::middleware(['auth.session'])->group(function () {
     Route::get('/identifikasiaset', [AsetController::class, 'index'])->name('frontend.identifikasiaset');
     Route::get('/formaset', [AsetController::class, 'form'])->name('frontend.formaset');
 
+    Route::get('/asetform', [AsetController::class, 'tambah'])->name('frontend.asetform');
+
     // Menampilkan halaman validasi
     Route::get('/validasi', [AsetController::class, 'validasi'])->name('frontend.validasiaset');
 
     // Menampilkan halaman validasi
-    Route::get('/validasiaset/{guid_aset}', [AsetController::class, 'validasiDetail'])->name('frontend.validasiasetdetail');
+    Route::get('/identifikasi/{guid_aset}', [AsetController::class, 'identifikasiDetail'])->name('frontend.identikasiasetdetail');
 
     // Submit validasi via POST
     Route::post('/validasikepala', [AsetController::class, 'validasiKepala'])->name('frontend.asetvalidasi');
@@ -46,10 +48,23 @@ Route::middleware(['auth.session'])->group(function () {
     // Rincian Aset
     Route::get('/rincian-aset/{guid_aset}', [AsetController::class, 'detail'])->name('frontend.rincianaset');
 
+    // Rincian Aset Submit
+    Route::post('/rincian-aset', [AsetController::class, 'permohonan'])->name('frontend.rincianasetsubmit');
 
     // Proses simpan data aset (POST)
     Route::post('/form-aset', [AsetController::class, 'store'])->name('frontend.formasetstore');
 
+    // Display Permohonan Aset
+    Route::get('/permohonan-aset', [AsetController::class, 'permohonanDetail'])->name('frontend.permohonan');
+    Route::get('/permohonan-aset/detail/{guid_aset}', [AsetController::class, 'permohonanAset'])->name('frontend.permohonandetail');
+    
+    Route::post('/permohonan-aset/validasi', [AsetController::class, 'validasiPermohonan'])->name('frontend.permohonanasetvalidasi');
+
+    // Display BMD Dimohon
+     Route::get('/permohonan-bmd', [AsetController::class, 'cetakBast'])->name('frontend.bmddimohon');
+
+     // Cetak BAST
+     Route::get('/cetak-bast/{kolok}', [AsetController::class, 'cetak'])->name('cetak.bast');
 
 });
 

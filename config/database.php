@@ -126,6 +126,21 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+
+        // Second SQL Server connection
+        'sqlsrv_3' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_THIRD_HOST', 'localhost'),
+            'port' => env('DB_THIRD_PORT', '1433'),
+            'database' => env('DB_THIRD_DATABASE', 'bpadmaster'),
+            'username' => env('DB_THIRD_USERNAME', 'data_abdi'),
+            'password' => env('DB_THIRD_PASSWORD', 'data_abdi_aja'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
+            'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
     ],
 
     /*

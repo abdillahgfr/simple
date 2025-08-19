@@ -15,6 +15,13 @@
         </div>
     </div>
 
+    {{-- Notifikasi Sukses --}}
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Konten Aset -->
     <div class="container mb-5">
         <div class="row bg-white shadow rounded p-4">
@@ -25,6 +32,13 @@
 
                 <!-- Thumbnail -->
                 <div class="d-flex mb-3">
+                    @if($aset->image)
+                        <img src="{{ asset('storage/' . $aset->image) }}" 
+                            class="img-thumbnail mr-2 thumb-img" 
+                            style="width: 80px; height: 80px;" 
+                            alt="{{ $aset->nabar }}" 
+                            onclick="changeMainImage(this)">
+                    @endif
                     @if($aset->image2)
                         <img src="{{ asset('storage/' . $aset->image2) }}" 
                             class="img-thumbnail mr-2 thumb-img" 
@@ -57,7 +71,7 @@
 
                 <div class="text-muted small">
                     <i class="fa fa-eye"></i> Dilihat: {{ $aset->jumlah_dilihat }} &nbsp;
-                    <i class="fa fa-user"></i> PD/UKPD Peminat: {{ $aset->jumlah_peminat }}
+                    <i class="fa fa-user"></i> PD/UKPD Peminat: {{ $aset->jumlahPermohonan }}
                 </div>
             </div>
 
@@ -87,12 +101,24 @@
 
                 <table class="table table-sm table-borderless mb-4" style="color: #838181">
                     <tr>
+                        <th class="w-50">Nama Barang</th>
+                        <td>{{ $aset->nabar }}</td>
+                    </tr>
+                    <tr>
+                        <th class="w-50">Kode Barang</th>
+                        <td>{{ $aset->kobar_108 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="w-50">No Register</th>
+                        <td>{{ $aset->noreg_108 }}</td>
+                    </tr>
+                    <tr>
                         <th class="w-50">PD/UKPD Pengguna Barang</th>
                         <td>{{ $aset->nalok }}</td>
                     </tr>
                     <tr>
                         <th>Harga</th>
-                        <td>Rp{{ number_format($aset->harga, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($aset->harga, 0, ',', '.') }}</td>
                     </tr>
                     <tr>
                         <th>Tanggal Perolehan</th>
@@ -106,18 +132,74 @@
                         <th>Tipe</th>
                         <td>{{ $aset->tipe }}</td>
                     </tr>
+                    <tr>
+                        <th>Deskripsi</th>
+                        <td>{{ $aset->deskripsi }}</td>
+                    </tr>
                 </table>
+                <form class="form-material" method="POST" action="{{ route('frontend.rincianasetsubmit') }}" enctype="multipart/form-data" id="form-aset">
+                    @csrf
+                    @php
+                        $user = session('user');
+                    @endphp
+                    <div class="form-group">
+                        <input type="hidden" name="guid_aset" value="{{ $aset->guid_aset }}">
+                        <input type="hidden" name="kobar_108" value="{{ $aset->kobar_108 }}">
+                        <input type="hidden" name="noreg_108" value="{{ $aset->noreg_108 }}">
+                        <input type="hidden" name="nabar" value="{{ $aset->nabar }}">
+                        <input type="hidden" name="kolokskpd" value="{{ $user->kolokskpd }}">
+                        <input type="hidden" name="kolok" value="{{ $user->kolok }}">
+                        <input type="hidden" name="nalok" value="{{ $user->nalok ?? $aset->nalok }}">
+                        <input type="hidden" name="bahan" value="{{ $aset->bahan }}">
+                        <input type="hidden" name="merk" value="{{ $aset->merk }}">
+                        <input type="hidden" name="tipe" value="{{ $aset->tipe }}">
+                        <input type="hidden" name="harga" value="{{ $aset->harga }}">
+                        <input type="hidden" name="tgloleh" value="{{ $aset->tgloleh }}">
+                        <input type="hidden" name="kondisi" value="{{ $aset->kondisi }}">
+                        <input type="hidden" name="deskripsi" value="{{ $aset->deskripsi }}">
+                        <input type="hidden" name="penggunaan_bmd" value="{{ $aset->penggunaan_bmd }}">
 
-                <div class="form-group">
-                    <label for="alasan" class="font-weight-bold">Alasan Permohonan</label>
-                    <textarea id="alasan" class="form-control" rows="4" placeholder="Tulis alasan permohonan di sini..."></textarea>
-                </div>
+                        <label for="alasan" class="font-weight-bold">Alasan Permohonan</label>
+                        <textarea id="alasan" name="alasan_permohonan" class="form-control" rows="4" placeholder="Tulis alasan permohonan di sini..." required></textarea>
+                    </div>
 
-                <button class="btn btn-success btn-block font-weight-bold">
-                    Ajukan Permohonan
-                </button>
+                    @if($sudahMengajukan)
+                        <button class="btn btn-secondary btn-block font-weight-bold" disabled>
+                            Permohonan Sudah Diajukan
+                        </button>
+                    @else
+                        <button class="btn btn-success btn-block font-weight-bold">
+                            Ajukan Permohonan
+                        </button>
+                    @endif
+                </form>
             </div>
         </div>
     </div>
 </main>
+
+
+<script>
+    const form = document.getElementById('form-aset');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: "Apakah Anda yakin ingin mengajukan aset ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    }
+</script>
+
 @endsection

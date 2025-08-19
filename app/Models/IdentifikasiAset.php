@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PermohonanAset;
 
 class IdentifikasiAset extends Model
 {
@@ -19,4 +20,10 @@ class IdentifikasiAset extends Model
     ];
 
     public $timestamps = false;
+
+    public function permohonan()
+    {
+        return $this->hasMany(PermohonanAset::class, 'guid_aset', 'guid_aset');
+    }
+
 }

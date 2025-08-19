@@ -19,12 +19,23 @@
         <!-- /.page-title-right -->
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
+
     <div class="dashboard-banner" style="background-image: url('assets/img/image1.jpg'); background-size: cover; background-position: center; border-radius: 24px; margin: 24px auto; height: 500px; padding: 0; overflow: hidden;">
         <div class="dashboard-banner-overlay" style="background: rgba(0,0,0,0.5); width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
             <h1 class="text-white font-weight-bold" style="font-size: 4.5rem; letter-spacing: 2px; text-shadow: 2px 4px 16px rgba(0,0,0,0.4);">Halo Sobat Aset</h1>
             <p class="text-white font-weight-bold" style="font-size: 1.5rem; letter-spacing: 1px; text-shadow: 1px 2px 8px rgba(0,0,0,0.3); margin-top: 12px;"># Aset Terjaga, Aset Berdayaguna</p>
         </div>
     </div>
+    
 
 </main>
 <!-- /.main-wrappper -->

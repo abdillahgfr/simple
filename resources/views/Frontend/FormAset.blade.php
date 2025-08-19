@@ -96,92 +96,118 @@
                             <p>Pilih dan unggah foto barang (Minimal 1 foto, maksimal 5 foto). Foto utama ditandai dengan border hijau.</p>
 
                             <div class="row">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="mb-3 image-upload-container" id="container-image"> {{-- Updated ID for main_image value --}}
-                                            <input type="file" name="image" id="foto-input-1" class="form-control image-input" accept="image/*" required>
-                                            <div class="form-check ml-4 mt-2">
-                                                <input class="form-check-input main-image-radio" type="radio" name="main_image" id="mainImage1" value="image" checked> {{-- Value set to 'image' matching input name --}}
-                                                <label class="form-check-label" for="mainImage1">
-                                                    Foto Utama
+                                @php
+                                    $imageKeys = ['image', 'image2', 'image3', 'image4', 'image5'];
+                                @endphp
+
+                                @foreach ($imageKeys as $index => $key)
+                                    <div class="col-md-2 position-relative">
+                                        <div class="form-group">
+                                            <div class="mb-3 image-upload-container position-relative">
+
+                                                {{-- Input File --}}
+                                                <input 
+                                                    type="file" 
+                                                    name="{{ $key }}" 
+                                                    id="foto-input-{{ $index + 1 }}" 
+                                                    class="form-control image-input" 
+                                                    accept="image/*" 
+                                                    {{ $index === 0 ? 'required' : '' }}> {{-- Hanya image (pertama) yang required --}}
+
+                                                {{-- Pilih Gambar Utama --}}
+                                                <input 
+                                                    type="radio" 
+                                                    name="main_image" 
+                                                    id="mainImage{{ $index + 1 }}" 
+                                                    value="{{ $key }}" 
+                                                    class="d-none main-image-radio" 
+                                                    {{ $index === 0 ? 'checked' : '' }}>
+                                                
+                                                <label 
+                                                    for="mainImage{{ $index + 1 }}" 
+                                                    class="star-label" 
+                                                    data-for="mainImage{{ $index + 1 }}">
+                                                    <i class="fa-solid fa-star star-icon text-warning fs-3 mr-2"></i>Foto Utama
                                                 </label>
+
+                                                {{-- Preview Gambar --}}
+                                                <img id="preview-image-{{ $index + 1 }}" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
                                             </div>
-                                            <img id="preview-image-1" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
-                                            @error('image')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="mb-3 image-upload-container" id="container-image2">
-                                            <input type="file" name="image2" id="foto-input-2" class="form-control image-input" accept="image/*"> {{-- Removed 'required' --}}
-                                            <div class="form-check ml-4 mt-2">
-                                                <input class="form-check-input main-image-radio" type="radio" name="main_image" id="mainImage2" value="image2">
-                                                <label class="form-check-label" for="mainImage2">
-                                                    Foto Utama
-                                                </label>
-                                            </div>
-                                            <img id="preview-image-2" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
-                                            @error('image2')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="mb-3 image-upload-container" id="container-image3">
-                                            <input type="file" name="image3" id="foto-input-3" class="form-control image-input" accept="image/*"> {{-- Removed 'required' --}}
-                                            <div class="form-check ml-4 mt-2">
-                                                <input class="form-check-input main-image-radio" type="radio" name="main_image" id="mainImage3" value="image3">
-                                                <label class="form-check-label" for="mainImage3">
-                                                    Foto Utama
-                                                </label>
-                                            </div>
-                                            <img id="preview-image-3" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
-                                            @error('image3')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="mb-3 image-upload-container" id="container-image4">
-                                            <input type="file" name="image4" id="foto-input-4" class="form-control image-input" accept="image/*"> {{-- Removed 'required' --}}
-                                            <div class="form-check ml-4 mt-2">
-                                                <input class="form-check-input main-image-radio" type="radio" name="main_image" id="mainImage4" value="image4">
-                                                <label class="form-check-label" for="mainImage4">
-                                                    Foto Utama
-                                                </label>
-                                            </div>
-                                            <img id="preview-image-4" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
-                                            @error('image4')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="mb-3 image-upload-container" id="container-image5">
-                                            <input type="file" name="image5" id="foto-input-5" class="form-control image-input" accept="image/*"> {{-- Removed 'required' --}}
-                                            <div class="form-check ml-4 mt-2">
-                                                <input class="form-check-input main-image-radio" type="radio" name="main_image" id="mainImage5" value="image5">
-                                                <label class="form-check-label" for="mainImage4">
-                                                    Foto Utama
-                                                </label>
-                                            </div>
-                                            <img id="preview-image-4" src="#" alt="Preview" style="display:none; max-width:100%; height:auto;" class="img-thumbnail mt-2">
-                                            @error('image4')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
+
+                            {{-- CSS --}}
+                            <style>
+                                .star-label {
+                                    cursor: pointer;
+                                    top: 0px;
+                                    z-index: 10;
+                                }
+
+                                .star-icon {
+                                    font-size: 15px;
+                                    opacity: 0.3;
+                                    transition: opacity 0.2s ease-in-out;
+                                    margin-top: 10px;
+                                }
+
+                                .star-label.active .star-icon {
+                                    opacity: 1;
+                                    margin-top: 10px
+                                }
+
+                                .image-upload-container {
+                                    position: relative;
+                                }
+                            </style>
+
+                            {{-- JavaScript --}}
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function () {
+                                    const radios = document.querySelectorAll('.main-image-radio');
+                                    const labels = document.querySelectorAll('.star-label');
+
+                                    // Tampilkan default aktif
+                                    radios.forEach(function (radio) {
+                                        if (radio.checked) {
+                                            const label = document.querySelector(`label[for="${radio.id}"]`);
+                                            if (label) label.classList.add('active');
+                                        }
+                                    });
+
+                                    // Klik bintang
+                                    labels.forEach(function (label) {
+                                        label.addEventListener('click', function () {
+                                            labels.forEach(l => l.classList.remove('active'));
+                                            label.classList.add('active');
+                                            const forId = label.getAttribute('data-for');
+                                            document.getElementById(forId).checked = true;
+                                        });
+                                    });
+
+                                    // Preview gambar
+                                    const inputs = document.querySelectorAll('.image-input');
+                                    inputs.forEach(function (input) {
+                                        input.addEventListener('change', function (e) {
+                                            const index = input.id.split('-').pop();
+                                            const preview = document.getElementById(`preview-image-${index}`);
+                                            const file = e.target.files[0];
+
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = function (e) {
+                                                    preview.src = e.target.result;
+                                                    preview.style.display = 'block';
+                                                }
+                                                reader.readAsDataURL(file);
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+
 
                             <div class="row">
                                 <div class="col-md-6 form-group">

@@ -67,7 +67,10 @@
         }
     </style>
 
+    
+
     <div class="container-fluid h-100">
+        
         <div class="row h-100 align-items-center login-wrapper">
             {{-- LEFT IMAGE SIDE --}}
             <div class="col-md-6 col-sm-6 d-flex justify-content-center">
@@ -90,7 +93,15 @@
                         <img src="{{ asset('assets/img/logo-header.png') }}" width="250" class="mb-3 mt-2" />
                     </div>
                     <h4 class="text-center"><b>Sign in</b></h4>
-
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="mb-3 bg-light p-3 rounded" style="font-size: 14px">
                         <ul style="padding-left: 1.2rem; margin: 0; color: #000;">
                             Gunakan jenis akun berikut:

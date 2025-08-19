@@ -71,17 +71,14 @@ class LoginController extends Controller
         $password = $request->input('password');
         $tahun    = $request->input('tahun', '2025');
 
-        logger()->info("Proses login dimulai", ['username' => $username, 'tahun' => $tahun]);
-
+    
         $user = $this->authenticate($username, $password, $tahun);
 
         if ($user && isset($user->success) && $user->code == 200) {
             session(['user' => $user->user]);
-            logger()->info("Login berhasil, user: ", (array) $user->user);
-            return redirect()->route('frontend.dashboard')->with('success', 'Login successful!');
+            return redirect()->route('frontend.dashboard')->with('success', 'Login Berhasil !');
         }
 
-        logger()->warning("Login gagal", ['response' => (array) $user]);
         return back()->withErrors(['login_error' => 'Username atau Password tidak terdaftar.']);
     }
 

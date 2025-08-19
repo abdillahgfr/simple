@@ -61,11 +61,6 @@
                             onclick="changeMainImage(this)">
                     @endif
                 </div>
-
-                <div class="text-muted small">
-                    <i class="fa fa-eye"></i> Dilihat: {{ $aset->jumlah_dilihat }} &nbsp;
-                    <i class="fa fa-user"></i> PD/UKPD Peminat: {{ $aset->jumlah_peminat }}
-                </div>
             </div>
 
             <!-- Script -->
@@ -95,8 +90,20 @@
 
                 <table class="table table-sm table-borderless mb-4" style="color: #838181">
                     <tr>
+                        <th class="w-50">KOLOK</th>
+                        <td>{{ $aset->kolok }}</td>
+                    </tr>
+                    <tr>
                         <th class="w-50">PD/UKPD Pengguna Barang</th>
                         <td>{{ $aset->nalok }}</td>
+                    </tr>
+                    <tr>
+                        <th class="w-50">Kode Barang</th>
+                        <td>{{ $aset->kobar_108 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="w-50">No Register</th>
+                        <td>{{ $aset->noreg_108 }}</td>
                     </tr>
                     <tr>
                         <th>Harga</th>
@@ -114,6 +121,10 @@
                         <th>Tipe</th>
                         <td>{{ $aset->tipe }}</td>
                     </tr>
+                    <tr>
+                        <th class="w-50">Deskripsi Barang</th>
+                        <td>{{ $aset->deskripsi }}</td>
+                    </tr>
                 </table>
 
                 {{-- <div class="form-group">
@@ -121,7 +132,7 @@
                     <textarea id="alasan" class="form-control" rows="4" placeholder="Tulis alasan permohonan di sini..."></textarea>
                 </div> --}}
 
-                <a href="{{ route('frontend.validasiaset')}}">
+                <a href="{{ route('frontend.identifikasiaset')}}">
                     <button class="btn btn-success btn-block font-weight-bold">
                         Kembali
                     </button>

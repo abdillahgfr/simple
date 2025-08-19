@@ -30,23 +30,24 @@
                     </li>
                 </ul>
             </li>
-            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.validasiaset') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Validasi Aset Idle</a>
-                <ul class="list-unstyled sub-menu">
-                    <li><a href="{{ route('frontend.validasiaset') }}">KIB B</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.asetidle') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Display Aset Idle</a>
+
+            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.asetidle') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-grid"></i> <span class="hide-menu">Display Aset Idle</a>
                 <ul class="list-unstyled sub-menu">
                     <li><a href="{{ route('frontend.asetidle') }}">KIB B</a>
                     </li>
                 </ul>
             </li>
-            <li class="menu-item-has-children"><a href="javascript:void(0);"><i class="list-icon feather feather-briefcase"></i> <span class="hide-menu">Permohonan Aset Idle</a>
+
+            <li class="menu-item-has-children current-page {{ request()->routeIs('frontend.permohonan') || request()->routeIs('frontend.bmddimohon') ? 'active' : '' }}"><a href="javascript:void(0);"><i class="list-icon feather feather-clipboard"></i> <span class="hide-menu">Permohonan Aset Idle</a>
                 <ul class="list-unstyled sub-menu">
-                    <li><a href="../default/app-calender.html">Daftar Permohonan</a>
+                    @php
+                        $user = session('user');
+                    @endphp
+                    @if($user && $user->idgroup === 'Kepala')
+                    <li><a href="{{ route('frontend.permohonan') }}" class="{{ request()->routeIs('frontend.permohonan') ? 'active' : '' }}">Daftar Permohonan</a>
                     </li>
-                    <li><a href="../default/app-chat.html">BMD Dimohon</a>
+                    @endif
+                    <li><a href="{{ route('frontend.bmddimohon') }}" class="{{ request()->routeIs('frontend.bmddimohon') ? 'active' : '' }}">BMD Dimohon</a>
                     </li>
                 </ul>
             </li>
