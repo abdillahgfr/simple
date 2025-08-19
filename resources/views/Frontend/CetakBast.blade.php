@@ -21,19 +21,19 @@
         $userKolok = session('user')->kolok ?? null;
     @endphp
 
-    @foreach ($grouped as $kolok => $items)
-        @if ($kolok == $userKolok)
+    @foreach($grouped as $kolok => $items)
+        @if($kolok == $userKolok)
             @php
-                $firstItem = collect($items)->first();
-                $opdName = ($firstItem['nalok'] ?? $firstItem['pemilik_nalok'] ?? '-') . ' (' . $firstItem['kolok'] . ')';
-                $adaDisetujui = collect($items)->where('disetujui', 'Disetujui')->count() > 0;
+                $opdName = $items->first()->nalok . ' (' . $kolok . ')';
+                $adaDisetujui = $items->where('disetujui', 'Disetujui')->count() > 0;
             @endphp
 
             <div class="card mb-4 shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <strong>{{ $opdName }}</strong>
-                    <button onclick="window.location='{{ route('cetak.bast', $kolok) }}'"
-                        class="btn btn-sm {{ $adaDisetujui ? 'btn-success' : 'btn-secondary' }}"
+                    <button 
+                        onclick="window.location='{{ route('cetak.bast', $kolok) }}'" 
+                        class="btn btn-sm {{ $adaDisetujui ? 'btn-success' : 'btn-secondary' }}" 
                         {{ $adaDisetujui ? '' : 'disabled' }}>
                         Cetak BAST
                     </button>
@@ -54,20 +54,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($items as $i => $row)
+                            @foreach($items as $i => $row)
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
-                                    <td>{{ $row['kobar_108'] }} - {{ $row['nabar'] }}</td>
-                                    <td>{{ $row['tgloleh'] }}</td>
-                                    <td>{{ $row['bahan'] }}</td>
-                                    <td>{{ $row['merk'] }}</td>
-                                    <td>{{ $row['tipe'] }}</td>
-                                    <td>{{ number_format($row['harga'], 0, ',', '.') }}</td>
-                                    <td>{{ $row['alasan_permohonan'] }}</td>
+                                    <td>{{ $i+1 }}</td>
+                                    <td>{{ $row->kobar_108 }} - {{ $row->nabar }}</td>
+                                    <td>{{ $row->tgloleh }}</td>
+                                    <td>{{ $row->bahan }}</td>
+                                    <td>{{ $row->merk }}</td>
+                                    <td>{{ $row->tipe }}</td>
+                                    <td>{{ number_format($row->harga,0,',','.') }}</td>
+                                    <td>{{ $row->alasan_permohonan }}</td>
                                     <td>
-                                        @if ($row['disetujui'] == 'Disetujui')
+                                        @if($row->disetujui == 'Disetujui')
                                             <span class="badge badge-success">Disetujui</span>
-                                        @elseif($row['disetujui'] == 'Tidak Disetujui')
+                                        @elseif($row->disetujui == 'Tidak Disetujui')
                                             <span class="badge badge-danger">Tidak Disetujui</span>
                                         @else
                                             <span class="badge badge-warning">Menunggu Konfirmasi</span>

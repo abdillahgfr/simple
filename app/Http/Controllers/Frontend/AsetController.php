@@ -957,10 +957,10 @@ class AsetController extends Controller
             return redirect()->route('login')->withErrors(['login_error' => 'Silakan login terlebih dahulu.']);
         }
 
-        // Ambil semua permohonan aset
+        // Ambil semua data permohonan aset + join ke master opd (misalnya kolok/nalok)
         $permohonan = DB::connection('sqlsrv_2')
             ->table('permohonan_aset as p')
-            ->leftJoin('bpadmaster.dbo.master_profile as m', 'p.kolok', '=', 'm.id_kolok')
+            ->join('bpadmaster.dbo.master_profile as m', 'p.kolok', '=', 'm.id_kolok') // sesuaikan nama tabel master opd
             ->select(
                 'p.id',
                 'p.guid_aset',
@@ -977,57 +977,16 @@ class AsetController extends Controller
                 'p.kolok',
                 'm.nalok'
             )
+            ->orderBy('m.nalok')
             ->get();
 
-        // Ambil data kolok asli dari pemilik barang
-        $identifikasi = DB::connection('sqlsrv_2')
-            ->table('identifikasi_aset as i')
-            ->leftJoin('bpadmaster.dbo.master_profile as m', 'i.kolok', '=', 'm.id_kolok')
-            ->select(
-                'i.guid_aset',
-                'i.kolok',
-                'm.nalok'
-            )
-            ->get();
-
-        // Gabungkan ke hasil permohonan
-        $allData = $permohonan->map(function ($item) use ($identifikasi) {
-            $pemilik = $identifikasi->firstWhere('guid_aset', $item->guid_aset);
-            if ($pemilik) {
-                return [
-                    'id' => $item->id,
-                    'guid_aset' => $item->guid_aset,
-                    'kobar_108' => $item->kobar_108,
-                    'nabar' => $item->nabar,
-                    'noreg_108' => $item->noreg_108,
-                    'tgloleh' => $item->tgloleh,
-                    'bahan' => $item->bahan,
-                    'tipe' => $item->tipe,
-                    'merk' => $item->merk,
-                    'harga' => $item->harga,
-                    'alasan_permohonan' => $item->alasan_permohonan,
-                    'disetujui' => $item->disetujui,
-                    // kolok & nalok pemohon
-                    'kolok' => $item->kolok,
-                    'nalok' => $item->nalok,
-                    // kolok & nalok pemilik barang
-                    'pemilik_kolok' => $pemilik->kolok,
-                    'pemilik_nalok' => $pemilik->nalok,
-                ];
-            }
-            return (array) $item;
-        });
-
-        // Group berdasarkan kolok pemohon DAN kolok pemilik
-        $grouped = $allData->groupBy('kolok')->merge(
-            $allData->groupBy('pemilik_kolok')
-        );
+        // Group by kolok/nama opd
+        $grouped = $permohonan->groupBy('kolok');
 
         return view('Frontend.CetakBast', [
             'grouped' => $grouped
         ]);
     }
-
 
     public function cetak($kolok)
     {
